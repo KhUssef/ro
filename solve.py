@@ -10,7 +10,7 @@ def solve_max_flow(edges, nodes, start, end):
     for edge in edges:
         u = edge['from']
         v = edge['to']
-        cap = edge['cap ']
+        cap = edge['cap']
         var_name = f"flow_{u}_{v}"
         flow_var = model.addVar(lb=0, ub=cap, name=var_name)
         flow_vars[(u, v)] = flow_var

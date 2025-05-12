@@ -15,9 +15,9 @@ let nodes = tempnodes.map(node => {
 
 let edges = tempedges.map(edge => {
   return {
-    'to' : edge.to,
-    'from' :  edge.from,
-    'cap' : parseInt(edge.cap),
+    'to' : parseInt(edge.to),
+    'from' :  parseInt(edge.from),
+    'cap' : parseFloat(edge.cap),
   }
 })
 let cur_length = nodes.length;
@@ -32,6 +32,9 @@ let edgeFromNode = null;
 let edgeToNode = null;
 let tempEdgeToX = null;
 let tempEdgeToY = null;
+let startNode = startNodet
+let endNode = endNodet
+console.log(startNodet, startNode, endNode, endNodet)
 // Calculate grid spacing based on canvas size
 function calculateGridSpacing() {
   return Math.min(canvas.width, canvas.height) / gridSize;
@@ -112,8 +115,8 @@ canvas.addEventListener('click', (e) => {
     
     // Only add if the position is a grid intersection and not already occupied
     if (!isPointOccupied(snapped.x, snapped.y)) {
-      cur_length+=1;
       const node = { id: cur_length, x: snapped.x, y: snapped.y };
+      cur_length+=1;
       nodes.push(node);
       
       // Update node count display
@@ -411,18 +414,18 @@ function deleteNode(id) {
   if (index >= 0) nodes.splice(index, 1);
   
   // Remove any edges connected to this node
-  const edgesToRemove = edges.filter(e => e.from === id || e.to === id);
+  const edgesToRemove = edges.filter(e => e.from == id || e.to == id);
   for (const edge of edgesToRemove) {
     const edgeIndex = edges.indexOf(edge);
     if (edgeIndex >= 0) edges.splice(edgeIndex, 1);
   }
   
   // Update start/end nodes if necessary
-  if (startNode === id) {
+  if (startNode == id) {
     startNode = null;
     document.getElementById('start-node').textContent = 'Start Node: Not set';
   }
-  if (endNode === id) {
+  if (endNode == id) {
     endNode = null;
     document.getElementById('end-node').textContent = 'End Node: Not set';
   }
@@ -486,13 +489,13 @@ document.getElementById("capacity-input").addEventListener("keydown", function(e
 function confirmEdge() {
   if (!edgeFromNode || !edgeToNode) return;
   
-  const capacity = parseInt(document.getElementById('capacity-value').value) || 0;
+  const capacity = parseFloat(document.getElementById('capacity-value').value) || 0;
   document.getElementById('capacity-value').value = 0
   edgecreationmenu = false;
   
   // Check if there's already an edge from edgeFromNode to edgeToNode
   const existingEdgeIndex = edges.findIndex(e => 
-    e.from === edgeFromNode.id && e.to === edgeToNode.id
+    e.from == edgeFromNode.id && e.to == edgeToNode.id
   );
   
   // Create or update the edge
@@ -546,7 +549,7 @@ function solveProblem() {
             return {
               'from': parseInt(edge.from),
               'to': parseInt(edge.to),
-              'cap': parseInt(edge.cap),
+              'cap': parseFloat(edge.cap),
             };
           }),
           startNode: parseInt(startNode),

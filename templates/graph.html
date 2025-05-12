@@ -63,8 +63,8 @@
   <script>
     const tempedges = JSON.parse('{{ edges|tojson|safe }}');
     const tempnodes = JSON.parse('{{ nodes|tojson|safe }}');
-    let startNode =  JSON.parse('{{ startNode|tojson|safe }}');
-    let endNode =  JSON.parse('{{ startNode|tojson|safe }}');
+    const startNodet =  JSON.parse('{{ startNode|tojson|safe }}');
+    const endNodet =  JSON.parse('{{ endNode|tojson|safe }}');
   </script>
   <script src="{{ url_for('static', filename='scripts.js')}}"></script>
 </body>
