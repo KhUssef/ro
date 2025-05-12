@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Interactive Graph Builder</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+<body>
+  <div id="canvas-container">
+    <canvas id="graph" width="600" height="600"></canvas>
+    <div id="status-message"></div>
+    <div class="instructions">Click on grid intersections to add nodes. Right-click on nodes for options.</div>
+  </div>
+  
+  <div id="options-panel">
+    <h2 class="panel-heading">Network Flow Configuration</h2>
+
+    
+    <div class="option-card">
+      <h3>Source & Sink Nodes</h3>
+      <div class="node-status">
+        <div class="node-indicator start-indicator"></div>
+        <div id="start-node">Start Node: Not set</div>
+      </div>
+      <div class="node-status">
+        <div class="node-indicator end-indicator"></div>
+        <div id="end-node">End Node: Not set</div>
+      </div>
+    </div>
+    
+    <div class="option-card">
+      <h3>Grid Settings</h3>
+      <div>
+        <label id="gridsizelabel">Grid Size:
+          <input id="grid-size" onchange="updateGridSize()" type="number" min="5" max="60" value="30"></input>
+        </label>
+      </div>
+    </div>
+    
+    <div class="stats-card">
+      <h3>Network Stats</h3>
+      <div class="stat-item">
+        <div>Nodes:</div>
+        <div id="nodes-count" class="stat-value">0</div>
+      </div>
+      <div class="stat-item">
+        <div>Edges:</div>
+        <div id="edges-count" class="stat-value">0</div>
+      </div>
+    </div>
+    
+    <div style="margin-top: 25px;">
+      <button class="solve-btn" onclick="solveProblem()">Solve Network Problem</button>
+    </div>
+  </div>
+  
+  <div id="menu" class="context-menu">{{ lol }}</div>
+  <div id="capacity-input" class="capacity-input">
+    <div>
+      <label>Capacity: <input type="number" id="capacity-value" min="0"></label>
+    </div>
+    <button onclick="confirmEdge()">Add Edge</button>
+  </div>
+  <script>
+    const tempedges = JSON.parse('{{ edges|tojson|safe }}');
+    const tempnodes = JSON.parse('{{ nodes|tojson|safe }}');
+    let startNode = 'n' + JSON.parse('{{ startNode|tojson|safe }}');
+    let endNode = 'n' + JSON.parse('{{ startNode|tojson|safe }}');
+  </script>
+  <script src="{{ url_for('static', filename='scripts.js')}}"></script>
+</body>
+  
+</html>

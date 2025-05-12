@@ -1,0 +1,225 @@
+body {
+  display: flex;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #f9f9f9;
+}
+#gridsizelabel {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 1em;
+}
+input#grid-size {
+  margin-top: 0.5em;
+  padding: 0.5em;
+  width: 100px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+input#grid-size:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  outline: none;
+}
+
+#canvas-container {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #ddd;
+  background-color: white;
+}
+#options-panel {
+  flex: 1;
+  padding: 25px;
+  background: linear-gradient(145deg, #f0f2f5, #f8fafc);
+  overflow-y: auto;
+}
+canvas { 
+  border: 1px solid #ccd;
+  margin-bottom: 15px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+  background-color: #fcfcff;
+}
+.panel-heading {
+  font-size: 24px;
+  margin-bottom: 30px;
+  color: #2c3e50;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 10px;
+}
+.option-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.option-card h3 {
+  margin-top: 0;
+  color: #3498db;
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+.context-menu {
+  position: absolute;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  display: none;
+  overflow: hidden;
+}
+.context-menu button { 
+  display: block; 
+  width: 100%; 
+  padding: 8px 15px;
+  border: none;
+  text-align: left;
+  background: white;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 14px;
+}
+.context-menu button:hover {
+  background-color: #f0f7ff;
+}
+label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+input[type="radio"] {
+  margin-right: 10px;
+}
+.radio-option {
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.radio-option:hover {
+  background-color: #f5f9ff;
+}
+.node-status {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 6px;
+  background-color: #f5f5f5;
+}
+.node-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+.roundabout {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.roundabout-inner {
+  position: absolute;
+  border-radius: 50%;
+  background-color: white;
+}
+.roundabout-label {
+  position: absolute;
+  font-weight: bold;
+  font-size: 12px;
+  z-index: 10;
+  top: 100%;
+  margin-top: 5px;
+  width: 100%;
+  text-align: center;
+}
+.start-indicator {
+  background-color: #4CAF50;
+}
+.end-indicator {
+  background-color: #F44336;
+}
+button.solve-btn {
+  padding: 12px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  width: 100%;
+  transition: background 0.3s;
+}
+button.solve-btn:hover {
+  background-color: #2980b9;
+}
+#status-message {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #e3f2fd;
+  display: none;
+  border-left: 4px solid #2196F3;
+}
+.capacity-input {
+  position: absolute;
+  display: none;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  z-index: 100;
+}
+.capacity-input input {
+  width: 80px;
+  margin-right: 8px;
+  padding: 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.capacity-input button {
+  padding: 6px 12px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+.capacity-input button:hover {
+  background: #43A047;
+}
+.instructions {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
+.stats-card {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f7f9fa;
+  border-radius: 6px;
+  border-left: 4px solid #3498db;
+}
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.stat-value {
+  font-weight: 500;
+  color: #2c3e50;
+}
