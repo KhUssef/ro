@@ -63,11 +63,10 @@
   <script>
     const tempedges = JSON.parse('{{ edges|tojson|safe }}');
     const tempnodes = JSON.parse('{{ nodes|tojson|safe }}');
-    let startNode = 'n' + JSON.parse('{{ startNode|tojson|safe }}');
-    let endNode = 'n' + JSON.parse('{{ startNode|tojson|safe }}');
+    let startNode =  JSON.parse('{{ startNode|tojson|safe }}');
+    let endNode =  JSON.parse('{{ startNode|tojson|safe }}');
   </script>
   <script src="{{ url_for('static', filename='scripts.js')}}"></script>
 </body>
-<input type="radio" name="problem-type" value="technical" checked>
   
 </html>

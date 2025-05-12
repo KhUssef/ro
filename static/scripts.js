@@ -7,20 +7,20 @@ let currentRightClickNode = null;
 
 let nodes = tempnodes.map(node => {
   return{
-    'id' : 'n'+ node.id,
+    'id' : node.id,
     'x' : node.x,
     'y' : node.y
   }
 })
+
 let edges = tempedges.map(edge => {
   return {
-    'to' : 'n' + edge[0],
-    'from' : "n" + edge[1],
-    'capacity' : parseInt(edge[2]),
-    'cost' : parseInt(edge[3])
-
+    'to' : edge.to,
+    'from' :  edge.from,
+    'cap' : parseInt(edge.cap),
   }
 })
+let cur_length = nodes.length;
 // Grid configuration
 let gridSize = parseInt(document.getElementById('grid-size').value);
 let gridSpacing;
@@ -80,8 +80,8 @@ canvas.addEventListener('click', (e) => {
   if (edgeCreationActive) {
     // Find if we clicked on a node
     const clickedNode = nodes.find(n => Math.hypot(n.x - x, n.y - y) < 10);
-    
-    if (clickedNode && clickedNode.id !== edgeFromNode.id) {
+
+    if (clickedNode && clickedNode.id != edgeFromNode.id) {
       // We've selected the destination node
       edgeToNode = clickedNode;
       
@@ -95,8 +95,6 @@ canvas.addEventListener('click', (e) => {
       capacityInput.style.top = (canvasRect.top + midY - 30) + 'px';
       
       // Show/hide cost input based on problem type
-      const isMinCost = document.querySelector('input[value="min-cost"]').checked;
-      document.getElementById('cost-input-container').style.display = isMinCost ? 'block' : 'none';
       edgecreationmenu = true;
       // Display the capacity input form
       capacityInput.style.display = 'block';
@@ -114,7 +112,8 @@ canvas.addEventListener('click', (e) => {
     
     // Only add if the position is a grid intersection and not already occupied
     if (!isPointOccupied(snapped.x, snapped.y)) {
-      const node = { id: "n" + nodes.length, x: snapped.x, y: snapped.y };
+      cur_length+=1;
+      const node = { id: cur_length, x: snapped.x, y: snapped.y };
       nodes.push(node);
       
       // Update node count display
@@ -195,14 +194,13 @@ document.body.addEventListener('click', (e) => {
 }
 
 function draw() {
+  console.log("drawn");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   // Draw grid
   drawGrid();
-  
   // Draw edges first (so they appear behind nodes)
   drawAllEdges();
-  
   // Draw temporary edge during creation
   if (edgeCreationActive && edgeFromNode && tempEdgeToX !== null) {
     ctx.beginPath();
@@ -219,8 +217,9 @@ function draw() {
   
   // Draw nodes (roundabouts)
   for (const node of nodes) {
-    const isStart = node.id === startNode;
-    const isEnd = node.id === endNode;
+    console.log(node);
+    const isStart = node.id == startNode;
+    const isEnd = node.id == endNode;
     drawRoundabout(node, isStart, isEnd);
   }
 }
@@ -259,7 +258,6 @@ function drawGrid() {
 function drawAllEdges() {
   // Group edges by their endpoints
   const edgeGroups = {};
-  
   // Index edges by their from-to combination
   for (const edge of edges) {
     const key = `${edge.from}-${edge.to}`;
@@ -272,8 +270,8 @@ function drawAllEdges() {
   // Process edge groups
   for (const key in edgeGroups) {
     const [fromId, toId] = key.split('-');
-    const from = nodes.find(n => n.id === fromId);
-    const to = nodes.find(n => n.id === toId);
+    const from = nodes.find(n => n.id == fromId);
+    const to = nodes.find(n => n.id == toId);
     
     if (!from || !to) continue;
     
@@ -298,14 +296,12 @@ function drawDirectionalEdge(from, to, edge) {
   const dy = to.y - from.y;
   const angle = Math.atan2(dy, dx);
   const length = Math.sqrt(dx * dx + dy * dy);
-  
   // Adjust start and end points to be at the edge of nodes
   const nodeRadius = 10;
   const startX = from.x + nodeRadius * Math.cos(angle);
   const startY = from.y + nodeRadius * Math.sin(angle);
   const endX = to.x - nodeRadius * Math.cos(angle);
   const endY = to.y - nodeRadius * Math.sin(angle);
-  
   // Draw the edge line
   ctx.beginPath();
   ctx.moveTo(startX, startY);
@@ -315,7 +311,6 @@ function drawDirectionalEdge(from, to, edge) {
   ctx.stroke();
   ctx.lineWidth = 1;
   ctx.strokeStyle = '#000';
-  
   // Draw arrowhead
   const headlen = 10;
   ctx.beginPath();
@@ -324,13 +319,12 @@ function drawDirectionalEdge(from, to, edge) {
   ctx.lineTo(endX - headlen * Math.cos(angle + Math.PI/6), endY - headlen * Math.sin(angle + Math.PI/6));
   ctx.fillStyle = '#2c3e50';
   ctx.fill();
-  
   // Draw capacity/cost label
   const midX = (from.x + to.x) / 2;
   const midY = (from.y + to.y) / 2;
   
   // Draw a white background for the text
-  const label = `cap: ${edge.capacity}`;
+  const label = `cap: ${edge.cap}`;
   ctx.font = '11px Arial';
   const textWidth = ctx.measureText(label).width;
   ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
@@ -378,9 +372,7 @@ function drawBidirectionalEdge(from, to, forwardEdge, reverseEdge) {
   ctx.lineTo(startX + headlen * Math.cos(angle - Math.PI/6), startY + headlen * Math.sin(angle - Math.PI/6));
   ctx.stroke();
   
-  // Determine if we need to show costs
-  const isMinCost = document.querySelector('input[value="min-cost"]').checked;
-  
+  // Determine if we need to show costs  
   // Calculate offset for labels
   const offsetX = 12 * Math.cos(perpAngle);
   const offsetY = 12 * Math.sin(perpAngle);
@@ -388,7 +380,7 @@ function drawBidirectionalEdge(from, to, forwardEdge, reverseEdge) {
   // Draw forward edge label (top)
   const forwardMidX = (from.x + to.x) / 2 + offsetX;
   const forwardMidY = (from.y + to.y) / 2 + offsetY;
-  const forwardLabel = isMinCost ? `cap: ${forwardEdge.capacity}, cost: ${forwardEdge.cost}` : `cap: ${forwardEdge.capacity}`;
+  const forwardLabel = `cap: ${forwardEdge.cap}`;
   
   ctx.font = '11px Arial';
   const forwardTextWidth = ctx.measureText(forwardLabel).width;
@@ -402,7 +394,7 @@ function drawBidirectionalEdge(from, to, forwardEdge, reverseEdge) {
   // Draw reverse edge label (bottom)
   const reverseMidX = (from.x + to.x) / 2 - offsetX;
   const reverseMidY = (from.y + to.y) / 2 - offsetY;
-  const reverseLabel = isMinCost ? `cap: ${reverseEdge.capacity}, cost: ${reverseEdge.cost}` : `cap: ${reverseEdge.capacity}`;
+  const reverseLabel = `cap: ${reverseEdge.cap}`;
   
   const reverseTextWidth = ctx.measureText(reverseLabel).width;
   ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
@@ -415,7 +407,7 @@ function drawBidirectionalEdge(from, to, forwardEdge, reverseEdge) {
 }
 
 function deleteNode(id) {
-  const index = nodes.findIndex(n => n.id === id);
+  const index = nodes.findIndex(n => n.id == id);
   if (index >= 0) nodes.splice(index, 1);
   
   // Remove any edges connected to this node
@@ -462,7 +454,7 @@ function startEdgeCreation(fromId) {
   
   // Set edge creation mode
   edgeCreationActive = true;
-  edgeFromNode = nodes.find(n => n.id === fromId);
+  edgeFromNode = nodes.find(n => n.id == fromId);
   
   // Show status message
   statusMessage.textContent = `Creating edge from ${fromId}. Click on destination node.`;
@@ -496,9 +488,6 @@ function confirmEdge() {
   
   const capacity = parseInt(document.getElementById('capacity-value').value) || 0;
   document.getElementById('capacity-value').value = 0
-  const isMinCost = document.querySelector('input[value="min-cost"]').checked;
-  const cost = isMinCost ? (parseInt(document.getElementById('cost-value').value) || 0) : 0;
-  document.getElementById('cost-value').value = 0
   edgecreationmenu = false;
   
   // Check if there's already an edge from edgeFromNode to edgeToNode
@@ -510,8 +499,7 @@ function confirmEdge() {
   const edge = {
     from: edgeFromNode.id,
     to: edgeToNode.id,
-    capacity: capacity,
-    cost: cost
+    cap: capacity,
   };
   
   if (existingEdgeIndex !== -1) {
@@ -535,12 +523,11 @@ function confirmEdge() {
 }
 
 function solveProblem() {
-    if (!startNode || !endNode) {
+    if (startNode === null || endNode === null) {
       alert("Please set both start and end nodes before solving.");
       return;
     }
   
-    const problemType = document.querySelector('input[name="problem-type"]:checked').value;
   
     fetch('/solve', {
         method: 'POST',
@@ -550,22 +537,20 @@ function solveProblem() {
         body: JSON.stringify({
           nodes: nodes.map(node => {
             return{
-              'id': parseInt(node.id.slice(1)),
+              'id': parseInt(node.id),
               'x': parseInt(node.x),
               'y': parseInt(node.y)
             }
           }),  // use map to return a new array
           edges: edges.map(edge => {  // use map for edges as well
-            return [
-              parseInt(edge.from.slice(1)),
-              parseInt(edge.to.slice(1)),
-              parseInt(edge.capacity),
-              parseInt(edge.cost)
-            ];
+            return {
+              'from': parseInt(edge.from),
+              'to': parseInt(edge.to),
+              'cap': parseInt(edge.cap),
+            };
           }),
-          startNode: parseInt(startNode.slice(1)),
-          endNode: parseInt(endNode.slice(1)),
-          type: problemType
+          startNode: parseInt(startNode),
+          endNode: parseInt(endNode),
         })
       })
       .then(response => response.text())  // because Flask returns HTML
@@ -578,13 +563,6 @@ function solveProblem() {
       
   }
   
-
-// Listen for problem type changes
-document.querySelectorAll('input[name="problem-type"]').forEach(radio => {
-  radio.addEventListener('change', () => {
-    draw(); // Redraw to update edge labels based on problem type
-  });
-});
 
 // ESC key cancels edge creation
 document.addEventListener('keydown', (e) => {
@@ -618,10 +596,3 @@ function init() {
 
 // Initialize on page load
 window.onload = init;
-
-
-
-
-
-
-
