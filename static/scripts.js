@@ -20,7 +20,7 @@ let edges = tempedges.map(edge => {
     'cap' : parseFloat(edge.cap),
   }
 })
-let cur_length = nodes.length;
+let cur_length = Math.max(...nodes.map(node => node.id))+1;
 // Grid configuration
 let gridSize = parseInt(document.getElementById('grid-size').value);
 let gridSpacing;
@@ -55,10 +55,6 @@ function initGrid() {
 function updateGridSize() {
   gridSize = parseInt(document.getElementById('grid-size').value);
   gridSpacing = calculateGridSpacing();
-  edges = []; // Reset edges on grid size change
-  nodes = [];
-  startNode = null;
-  endNode = null;
   draw();
 }
 
@@ -493,7 +489,7 @@ function confirmEdge() {
   document.getElementById('capacity-value').value = 0
   edgecreationmenu = false;
   
-  // Check if there's already an edge from edgeFromNode to edgeToNode
+  // Check if there's  already an edge from edgeFromNode to edgeToNode
   const existingEdgeIndex = edges.findIndex(e => 
     e.from == edgeFromNode.id && e.to == edgeToNode.id
   );
