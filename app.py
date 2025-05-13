@@ -25,6 +25,7 @@ def index():
 
 @app.route('/solve', methods=['POST'])
 def solve():
+    print()
     data = request.get_json()    
     edges = data.get('edges', [])
     nodes = data.get('nodes', [])
@@ -41,7 +42,7 @@ def solve():
     
     model, results = solve_max_flow(edges, nodes, startNode, endNode)
     objective_label = "Maximum Flow Value"
-
+    print('model',model, 'result',results)
     if model.status == 2:  # GRB.OPTIMAL
         return render_template('solution.html', 
                                results=results, 

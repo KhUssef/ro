@@ -51,13 +51,15 @@
         <h3>Flow Assignment:</h3>
         <table>
             <tr>
-                <th>Edge</th>
+                <th>from</th>
+                <th>to</th>
                 <th>Flow</th>
             </tr>
-            {% for var_name, value in results %}
+            {% for i in results %}
             <tr>
-                <td>{{ var_name }}</td>
-                <td>{{ "%.2f"|format(value) }}</td>
+                <td>{{ i.from }}</td>
+                <td>{{ i.to }}</td>
+                <td>{{ "%.2f"|format(i.flow) }}</td>
             </tr>
             {% endfor %}
         </table>
