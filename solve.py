@@ -47,10 +47,11 @@ def solve_max_flow(edges, nodes, start, end):
     model.optimize()
     
     # Extract results (active flows > 0.001)
-    results = [
-        (var.VarName, round(var.X, 3))
-        for var in model.getVars()
-        if var.X > 0.001
-    ] if model.status == GRB.OPTIMAL else []
-    
+    results =[]
+    if model.status != GRB.OPTIMAL:
+        return model, []
+    for var in model.getVars():
+        if var.X > 0.001:
+            temp = var.VarName.split('_')
+            results.append({'from' : temp[1], 'to' : temp[2], 'flow' : round(var.X, 3)})
     return model, results
