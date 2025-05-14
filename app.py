@@ -1,54 +1,61 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from solve import solve_max_flow
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'
+CORS(app)  # Enable CORS for Next.js frontend
 
-@app.route('/')
-def index():
-    nodes =  [{'id': 0, 'x': 259, 'y': 181}, {'id': 1, 'x': 492, 'y': 207}, {'id': 2, 'x': 337, 'y': 440}, {'id': 3, 'x': 622, 'y': 389}]
-    edges1 = [[0, 1, 12.2], [1, 2, 15.6], [2, 3, 3.2]]
-    edges = [{}, {}, {}]
-    for i in range(3):
-        edges[i]["from"] = edges1[i][0]
-        edges[i]["to"] = edges1[i][1]
-        edges[i]["cap"] = edges1[i][2]
-    if(session.get("nodes") != None and session.get("edges")!= None and session.get("startNode") !=None and session.get("endNode") !=None):
-        edges = session.get("edges")
-        nodes = session.get("nodes")
-        startNode = session.get("startNode") 
-        endNode = session.get("endNode") 
-    print(edges)
-    startNode = 0
-    endNode = 3
-    return render_template('graph.html', edges=edges, nodes=nodes, startNode=startNode, endNode=endNode)
-
-@app.route('/solve', methods=['POST'])
+@app.route('/api/solve', methods=['POST'])
 def solve():
-    data = request.get_json()    
+    data = request.get_json()
     edges = data.get('edges', [])
     nodes = data.get('nodes', [])
     startNode = data.get('startNode')
     endNode = data.get('endNode')
-    session["nodes"] = nodes
-    session["edges"] = edges
-    session["startNode"] = startNode
-    session["endNode"] = endNode
-    print(edges, nodes, startNode, endNode)
-    if startNode==None or endNode==None:
-        return "Please set both start and end nodes", 400
 
-    
-    model, results = solve_max_flow(edges, nodes, startNode, endNode)
-    objective_label = "Maximum Flow Value"
+    # Debug: Log the incoming data
+    print("Received data:", {
+        "edges": edges,
+        "nodes": nodes,
+        "startNode": startNode,
+        "endNode": endNode
+    })
+
+    if startNode is None or endNode is None:
+        return jsonify({"error": "Please set both start and end nodes"}), 400
+
+    # Format edges as a list of dictionaries to match solve_max_flow's expectation
+    formatted_edges = []
+    for edge in edges:
+        from_node = edge.get('from')
+        to_node = edge.get('to')
+        cap = edge.get('cap', 10)  # Default capacity if not provided
+        if from_node is not None and to_node is not None:
+            formatted_edges.append({
+                "from": from_node,
+                "to": to_node,
+                "cap": cap
+            })
+
+    # Pass formatted edges to solve_max_flow
+    model, results = solve_max_flow(formatted_edges, nodes, startNode, endNode)
 
     if model.status == 2:  # GRB.OPTIMAL
-        return render_template('solution.html', 
-                               results=results, 
-                               objective=model.ObjVal,
-                               objective_label=objective_label)
+        # Map results back to the original edge names
+        mapped_results = []
+        for var_name, value in results:
+            if var_name.startswith('flow_'):
+                mapped_results.append([var_name, str(value)])
+            else:
+                print(f"Unexpected variable name: {var_name}")
+        print("Returning results:", mapped_results)
+        return jsonify({
+            "results": mapped_results,
+            "objective": model.ObjVal,
+            "objective_label": "Maximum Flow Value"
+        })
     else:
-        return "No feasible solution found", 400
+        return jsonify({"error": "No feasible solution found"}), 400
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
