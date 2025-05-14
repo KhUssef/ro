@@ -37,20 +37,13 @@ def solve():
                 "cap": cap
             })
 
-    # Pass formatted edges to solve_max_flow
     model, results = solve_max_flow(formatted_edges, nodes, startNode, endNode)
 
-    if model.status == 2:  # GRB.OPTIMAL
-        # Map results back to the original edge names
-        mapped_results = []
-        for var_name, value in results:
-            if var_name.startswith('flow_'):
-                mapped_results.append([var_name, str(value)])
-            else:
-                print(f"Unexpected variable name: {var_name}")
-        print("Returning results:", mapped_results)
+    if model.status == 2:  
+        
+        print("Returning results:", results)
         return jsonify({
-            "results": mapped_results,
+            "results": results,
             "objective": model.ObjVal,
             "objective_label": "Maximum Flow Value"
         })
